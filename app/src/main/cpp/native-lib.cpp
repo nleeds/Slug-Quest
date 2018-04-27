@@ -9,4 +9,6 @@ Java_com_example_chris_myapplication_MainActivity_stringFromJNI(
         jobject /* this */) {
     std::string hello = "Hello from C++";
     return env->NewStringUTF(hello.c_str());
+
+    // nicolae wuz here
 }
