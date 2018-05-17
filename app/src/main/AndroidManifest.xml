@@ -38,11 +38,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Map_Activity"
-            android:label="@string/title_activity_map_">
-        </activity>
+            android:label="@string/title_activity_map_" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".CreditsActivity"
+            android:label="Slug Quest - Credits"/>
 
     </application>
 
