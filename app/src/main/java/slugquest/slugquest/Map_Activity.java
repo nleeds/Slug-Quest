@@ -11,7 +11,6 @@ import android.app.AlertDialog;
 import android.Manifest;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -68,8 +67,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                 .radius(10000)
                 .strokeColor(Color.RED)
                 .fillColor(Color.BLUE));
-        Toast.makeText(Map_Activity.this,"setMyLocationEnabled",Toast.LENGTH_SHORT).show();
-
     }
 
     //Permission request
@@ -123,7 +120,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                 circle.getCenter().longitude, circle.getCenter().latitude, longitude, latitude
         ) < circle.getRadius();}
 
-
+    // helper function for geofence
     double calculateDistance(
             double longitude1, double latitude1,
             double longitude2, double latitude2) {
