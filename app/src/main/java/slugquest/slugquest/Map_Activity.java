@@ -41,10 +41,33 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(36.9915, -122.0583);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in UCSC"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        // points of interest
+        LatLng Ucsc = new LatLng(36.9915, -122.0583);
+        LatLng BudaHut = new LatLng( 37.006443, -122.059919);
+        LatLng CatShrine = new LatLng(37.006699,-122.056143);
+        LatLng McHenry = new LatLng(36.995587, -122.058374);
+        LatLng MerrillGarden = new LatLng(36.998865, -122.051996);
+        LatLng PorterMeadows = new LatLng(36.994803, -122.067737);
+        LatLng Arboretum = new LatLng(36.983092, -122.060712);
+        LatLng KoiPond = new LatLng(37.000288, -122.048409);
+        LatLng RockGarden = new LatLng(37.001445, -122.049664);
+        LatLng QuarryPlaza = new LatLng(36.997631, -122.055762);
+
+        //markers
+        mMap.addMarker(new MarkerOptions().position(Ucsc).title("Marker in UCSC"));
+        mMap.addMarker(new MarkerOptions().position(BudaHut).title("Marker in BudaHut"));
+        mMap.addMarker(new MarkerOptions().position(CatShrine).title("Marker in CatShrine"));
+        mMap.addMarker(new MarkerOptions().position(McHenry).title("Marker in McHenry"));
+        mMap.addMarker(new MarkerOptions().position(MerrillGarden).title("Marker in MerrillGarden"));
+        mMap.addMarker(new MarkerOptions().position(PorterMeadows).title("Marker in PorterMeadows"));
+        mMap.addMarker(new MarkerOptions().position(Arboretum).title("Marker in Arboretum"));
+        mMap.addMarker(new MarkerOptions().position(KoiPond).title("Marker in KoiPond"));
+        mMap.addMarker(new MarkerOptions().position(RockGarden).title("Marker in RockGarden"));
+        mMap.addMarker(new MarkerOptions().position(QuarryPlaza).title("Marker in QuarryPlaza"));
+
+
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(Ucsc));
 
         // Location Services -> need to ask permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -62,11 +85,58 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         //mMap.setOnMyLocationClickListener(this);
 
         //example of geofence area
-        Circle circle = mMap.addCircle(new CircleOptions()
-                .center(new LatLng(-33.87365, 151.20689))
-                .radius(10000)
-                .strokeColor(Color.RED)
-                .fillColor(Color.BLUE));
+        Circle UCSC = mMap.addCircle(new CircleOptions()
+                .center(Ucsc)
+                .radius(150)
+                .fillColor(0x220000FF));
+
+        Circle BUDAHUT = mMap.addCircle(new CircleOptions()
+                .center(BudaHut)
+                .radius(150)
+                .fillColor(0x220000FF));
+
+        Circle CATSHRINE = mMap.addCircle(new CircleOptions()
+                .center(CatShrine)
+                .radius(150)
+                .fillColor(0x220000FF));
+
+        Circle MCHENRY = mMap.addCircle(new CircleOptions()
+                .center(McHenry)
+                .radius(150)
+                .fillColor(0x220000FF));
+
+        Circle MERRILLGARDEN = mMap.addCircle(new CircleOptions()
+                .center(MerrillGarden)
+                .radius(150)
+                .fillColor(0x220000FF));
+
+        Circle PORTERMEADOWS = mMap.addCircle(new CircleOptions()
+                .center(PorterMeadows)
+                .radius(150)
+                .fillColor(0x220000FF));
+
+        Circle ARBORETUM = mMap.addCircle(new CircleOptions()
+                .center(Arboretum)
+                .radius(150)
+                .fillColor(0x220000FF));
+
+        Circle KOIPOND = mMap.addCircle(new CircleOptions()
+                .center(KoiPond)
+                .radius(150)
+                .fillColor(0x220000FF));
+
+        Circle ROCKGARDEN = mMap.addCircle(new CircleOptions()
+                .center(RockGarden)
+                .radius(150)
+                .fillColor(0x220000FF));
+
+        Circle QUARRYPLAZA = mMap.addCircle(new CircleOptions()
+                .center(QuarryPlaza)
+                .radius(150)
+                .fillColor(0x220000FF));
+
+
+
     }
 
     //Permission request
