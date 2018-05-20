@@ -1,8 +1,15 @@
 package slugquest.slugquest;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -18,7 +25,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.Calendar;
 
 
 public class Map_Activity extends FragmentActivity implements OnMapReadyCallback {
@@ -41,10 +51,11 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+
         // points of interest
         LatLng Ucsc = new LatLng(36.9915, -122.0583);
-        LatLng BudaHut = new LatLng( 37.006443, -122.059919);
-        LatLng CatShrine = new LatLng(37.006699,-122.056143);
+        LatLng BudaHut = new LatLng(37.006443, -122.059919);
+        LatLng CatShrine = new LatLng(37.006699, -122.056143);
         LatLng McHenry = new LatLng(36.995587, -122.058374);
         LatLng MerrillGarden = new LatLng(36.998865, -122.051996);
         LatLng PorterMeadows = new LatLng(36.994803, -122.067737);
@@ -63,8 +74,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(Arboretum).title("Marker in Arboretum"));
         mMap.addMarker(new MarkerOptions().position(KoiPond).title("Marker in KoiPond"));
         mMap.addMarker(new MarkerOptions().position(RockGarden).title("Marker in RockGarden"));
-        mMap.addMarker(new MarkerOptions().position(QuarryPlaza).title("Marker in QuarryPlaza"));
-
+//        mMap.addMarker(new MarkerOptions().position(QuarryPlaza).title("Marker in QuarryPlaza"));
 
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Ucsc));
@@ -136,27 +146,58 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                 .fillColor(0x220000FF));
 
 
+        //test to check if geofences work.
 
+        LocationManager locationManager = (LocationManager)
+                getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        Location location = locationManager.getLastKnownLocation(locationManager
+                .getBestProvider(criteria, false));
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+
+        LatLng myLocation = new LatLng(latitude, longitude);
+        boolean inside = checkInside(QUARRYPLAZA, longitude, latitude);
+        String isInside;
+        if (inside == true) {
+            isInside = "you are in QUARRYPLAZA";
+        } else {
+            isInside = "you are not in QUARRYPLAZA";
+        }
+        mMap.addMarker(new MarkerOptions().position(myLocation).title((isInside)));
+        //end test
+
+
+
+        // Constrain the camera target to the general area
+        LatLngBounds GAMEAREA = new LatLngBounds(
+                new LatLng(36.977163, -122.038426), new LatLng(37.010616, -122.044647));
+
+        mMap.setLatLngBoundsForCameraTarget(GAMEAREA);
+        mMap.setMinZoomPreference(14.0f);
+        mMap.setMaxZoomPreference(30.0f);
     }
 
     //Permission request
-    public void permissionRequest(){
-        if(ContextCompat.checkSelfPermission(Map_Activity.this,
-                Manifest.permission.ACCESS_FINE_LOCATION)== PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(Map_Activity.this,"Already granted",Toast.LENGTH_SHORT).show();
-        }else{
+    public void permissionRequest() {
+        if (ContextCompat.checkSelfPermission(Map_Activity.this,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(Map_Activity.this, "Already granted", Toast.LENGTH_SHORT).show();
+        } else {
             requestLocationPermission();
         }
     }
-    private void requestLocationPermission(){
-        if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
+
+    private void requestLocationPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
             new AlertDialog.Builder(this)
                     .setTitle("Permission Needed")
                     .setMessage("This is the whole app, come on")
                     .setPositiveButton("ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(Map_Activity.this,new String [] {Manifest.permission.ACCESS_FINE_LOCATION},LOCATION_PERMISSION);
+                            ActivityCompat.requestPermissions(Map_Activity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION);
                         }
                     })
                     .setNegativeButton("Fuck you", new DialogInterface.OnClickListener() {
@@ -166,19 +207,19 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                         }
                     })
                     .create().show();
-        }else{
-            ActivityCompat.requestPermissions(this,new String [] {Manifest.permission.ACCESS_FINE_LOCATION},LOCATION_PERMISSION);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION);
         }
 
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == LOCATION_PERMISSION){
-            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(this,"Permission Granted",Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(this,"Access denied",Toast.LENGTH_SHORT).show();
+        if (requestCode == LOCATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Access denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -188,7 +229,8 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     boolean checkInside(Circle circle, double longitude, double latitude) {
         return calculateDistance(
                 circle.getCenter().longitude, circle.getCenter().latitude, longitude, latitude
-        ) < circle.getRadius();}
+        ) < circle.getRadius();
+    }
 
     // helper function for geofence
     double calculateDistance(
