@@ -48,6 +48,12 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/slugquest" />
 
+    <ImageView
+        android:id="@+id/testImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/imagetest" />
+
     <Button
         android:id="@+id/startButton"
         android:layout_width="242dp"
