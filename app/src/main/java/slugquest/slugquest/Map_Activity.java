@@ -50,12 +50,8 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-<<<<<<< HEAD
         // Event Input  (String name, double xCoordinate, double yCoordinate, String image)
         Event porterMeadowsEvent = new Event("Porter Meadows",36.994803, -122.067737,"sunset",1);
-=======
->>>>>>> bab3473ab8cfebdec73cf25f2fbdbd4a5448e1a0
 
         // points of interest
         LatLng Ucsc = new LatLng(36.9915, -122.0583);
