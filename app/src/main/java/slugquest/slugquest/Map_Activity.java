@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.app.AlertDialog;
 import android.Manifest;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,6 +37,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private int LOCATION_PERMISSION = 1;
+    private Button eventButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +48,26 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         requestLocationPermission();
+
+        eventButton = findViewById(R.id.eventButton);
+        eventButton.setOnClickListener(new Button.OnClickListener(){
+            public void onClick(View v){
+                nextEvent();
+            }
+        });
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // Event Input  (String name, double xCoordinate, double yCoordinate, String image)
-        Event porterMeadowsEvent = new Event("Porter Meadows",36.994803, -122.067737,"sunset",1);
+        //Event porterMeadowsEvent = new Event("Porter Meadows",36.994803, -122.067737,"sunset",1);
+        Event activeEvent = ((Globals) this.getApplication()).getEvent();
+
+        plotEvent(activeEvent);
+
+        //Active LatLang
+        //LatLng activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
 
         // points of interest
         LatLng Ucsc = new LatLng(36.9915, -122.0583);
@@ -65,16 +81,19 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         LatLng RockGarden = new LatLng(37.001445, -122.049664);
         LatLng QuarryPlaza = new LatLng(36.997631, -122.055762);
 
+        // Global Active Test Marker
+        //mMap.addMarker(new MarkerOptions().position(activeLatLng).title("Global Test"));
+
         //markers
-        mMap.addMarker(new MarkerOptions().position(Ucsc).title("Marker in UCSC"));
-        mMap.addMarker(new MarkerOptions().position(BudaHut).title("Marker in BudaHut"));
-        mMap.addMarker(new MarkerOptions().position(CatShrine).title("Marker in CatShrine"));
-        mMap.addMarker(new MarkerOptions().position(McHenry).title("Marker in McHenry"));
-        mMap.addMarker(new MarkerOptions().position(MerrillGarden).title("Marker in MerrillGarden"));
-        mMap.addMarker(new MarkerOptions().position(PorterMeadows).title("Marker in PorterMeadows"));
-        mMap.addMarker(new MarkerOptions().position(Arboretum).title("Marker in Arboretum"));
-        mMap.addMarker(new MarkerOptions().position(KoiPond).title("Marker in KoiPond"));
-        mMap.addMarker(new MarkerOptions().position(RockGarden).title("Marker in RockGarden"));
+        //mMap.addMarker(new MarkerOptions().position(Ucsc).title("Marker in UCSC"));
+        //mMap.addMarker(new MarkerOptions().position(BudaHut).title("Marker in BudaHut"));
+        //mMap.addMarker(new MarkerOptions().position(CatShrine).title("Marker in CatShrine"));
+        //mMap.addMarker(new MarkerOptions().position(McHenry).title("Marker in McHenry"));
+        //mMap.addMarker(new MarkerOptions().position(MerrillGarden).title("Marker in MerrillGarden"));
+        //mMap.addMarker(new MarkerOptions().position(PorterMeadows).title("Marker in PorterMeadows"));
+        //mMap.addMarker(new MarkerOptions().position(Arboretum).title("Marker in Arboretum"));
+        //mMap.addMarker(new MarkerOptions().position(KoiPond).title("Marker in KoiPond"));
+        //mMap.addMarker(new MarkerOptions().position(RockGarden).title("Marker in RockGarden"));
 //        mMap.addMarker(new MarkerOptions().position(QuarryPlaza).title("Marker in QuarryPlaza"));
 
 
@@ -95,52 +114,15 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         //mMap.setOnMyLocationButtonClickListener(this);
         //mMap.setOnMyLocationClickListener(this);
 
+
+        //Global Circle
+        //Circle ActiveCircle = mMap.addCircle(new CircleOptions()
+        //        .center(activeLatLng)
+        //        .radius(150)
+        //        .fillColor(0x220000FF));
+
+
         //example of geofence area
-        Circle UCSC = mMap.addCircle(new CircleOptions()
-                .center(Ucsc)
-                .radius(150)
-                .fillColor(0x220000FF));
-
-        Circle BUDAHUT = mMap.addCircle(new CircleOptions()
-                .center(BudaHut)
-                .radius(150)
-                .fillColor(0x220000FF));
-
-        Circle CATSHRINE = mMap.addCircle(new CircleOptions()
-                .center(CatShrine)
-                .radius(150)
-                .fillColor(0x220000FF));
-
-        Circle MCHENRY = mMap.addCircle(new CircleOptions()
-                .center(McHenry)
-                .radius(150)
-                .fillColor(0x220000FF));
-
-        Circle MERRILLGARDEN = mMap.addCircle(new CircleOptions()
-                .center(MerrillGarden)
-                .radius(150)
-                .fillColor(0x220000FF));
-
-        Circle PORTERMEADOWS = mMap.addCircle(new CircleOptions()
-                .center(PorterMeadows)
-                .radius(150)
-                .fillColor(0x220000FF));
-
-        Circle ARBORETUM = mMap.addCircle(new CircleOptions()
-                .center(Arboretum)
-                .radius(150)
-                .fillColor(0x220000FF));
-
-        Circle KOIPOND = mMap.addCircle(new CircleOptions()
-                .center(KoiPond)
-                .radius(150)
-                .fillColor(0x220000FF));
-
-        Circle ROCKGARDEN = mMap.addCircle(new CircleOptions()
-                .center(RockGarden)
-                .radius(150)
-                .fillColor(0x220000FF));
-
         Circle QUARRYPLAZA = mMap.addCircle(new CircleOptions()
                 .center(QuarryPlaza)
                 .radius(150)
@@ -246,5 +228,28 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                                         Math.toRadians(longitude1));
         c = c > 0 ? Math.min(1, c) : Math.max(-1, c);
         return 3959 * 1.609 * 1000 * Math.acos(c);
+    }
+
+
+   // Boils down the google maps plotting and circles to a function
+    void plotEvent(Event activeEvent){
+        // x and y coordinates
+        LatLng activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
+
+        // puts point on map for actual locations
+        mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
+
+        //Global Circle
+        Circle ActiveCircle = mMap.addCircle(new CircleOptions()
+                .center(activeLatLng)
+                .radius(150)
+                .fillColor(0x220000FF));
+    }
+
+    //Clears old events, updates global active event, plots event with above function
+    void nextEvent(){
+        mMap.clear();
+        ((Globals) this.getApplication()).updateEvent();
+        plotEvent(((Globals) this.getApplication()).getEvent());
     }
 }

@@ -8,7 +8,7 @@ public class Globals extends Application{
 
 
     // Declares active event that will be overwritten as user progresses
-    private Event activeEvent = new Event("Porter Meadows",36.994803, -122.067737,"sunset",1);
+    private Event activeEvent = new Event("Global Event",36.994803, -122.067737,"sunset",1);
     //public Event[] eventArray;
 
     //Declares all events
