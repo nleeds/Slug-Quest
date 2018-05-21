@@ -14,7 +14,6 @@ import android.util.Log;
 public class TitleActivity extends AppCompatActivity {
 
     //Test Var
-    Globals global = (Globals)getApplication();
     ImageView iv;
 
     @Override
@@ -22,9 +21,14 @@ public class TitleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_title);
 
-        //Image test
+        //Global Test   => How to use global variables                                       ((Globals) this.getApplication())
+        //String globTest = ((Globals) this.getApplication()).getImage();
 
-        Event porterMeadowsEvent = new Event("Porter Meadows",36.994803, -122.067737,"sunset",1);
+
+        //Image test => Shows that we can read global variables from different files! Yay!!
+
+        //Event porterMeadowsEvent = new Event("Porter Meadows",36.994803, -122.067737,"sunset",1);
+        Event porterMeadowsEvent = ((Globals) this.getApplication()).getEvent();
         String imageName = porterMeadowsEvent.imageName;
         //String imageName = "slugquest";
 

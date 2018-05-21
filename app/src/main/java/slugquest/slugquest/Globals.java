@@ -6,13 +6,8 @@ import android.util.Log;
 
 public class Globals extends Application{
 
-    private static Globals singleton;
 
-    public static Globals getInstance(){
-        return singleton;
-    }
-
-    /*// Declares active event that will be overwritten as user progresses
+    // Declares active event that will be overwritten as user progresses
     private Event activeEvent = new Event("Porter Meadows",36.994803, -122.067737,"sunset",1);
     //public Event[] eventArray;
 
@@ -27,19 +22,13 @@ public class Globals extends Application{
     }
 
     //Active event updated to child of current event
-    public void updateEvent(Event e){
+    public void updateEvent(){
         this.activeEvent = this.eventArray[this.activeEvent.next];
     }
-    */
-    public String getImage(){
-        //return this.activeEvent.imageName;
-        return "sunset";
-    }
 
-    @Override
-    public void onCreate(){
-        super.onCreate();
-        singleton = this;
+    public String getImage(){
+        return this.activeEvent.imageName;
+        //return "sunset";
     }
 
 }
