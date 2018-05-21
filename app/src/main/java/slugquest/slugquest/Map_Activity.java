@@ -1,14 +1,11 @@
 package slugquest.slugquest;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -17,7 +14,9 @@ import android.os.Bundle;
 import android.app.AlertDialog;
 import android.Manifest;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.widget.Toast;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -25,16 +24,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.Calendar;
+import static android.content.ContentValues.TAG;
 
 
 public class Map_Activity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private int LOCATION_PERMISSION = 1;
+
+    protected LocationListener locationListener;
+    protected LocationManager locationManager;
+    protected Context context;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         requestLocationPermission();
+        registerLocationUpdates();
     }
 
     @Override
@@ -147,7 +151,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
 
         //test to check if geofences work.
-
         LocationManager locationManager = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -169,14 +172,24 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         //end test
 
 
-
         // Constrain the camera target to the general area
-        LatLngBounds GAMEAREA = new LatLngBounds(
-                new LatLng(36.977163, -122.038426), new LatLng(37.010616, -122.044647));
+//        LatLngBounds GAMEAREA = new LatLngBounds(
+//                new LatLng(36.992889, -122.060231), new LatLng(37.000199, -122.052524));
 
-        mMap.setLatLngBoundsForCameraTarget(GAMEAREA);
-        mMap.setMinZoomPreference(14.0f);
-        mMap.setMaxZoomPreference(30.0f);
+//        mMap.setLatLngBoundsForCameraTarget(GAMEAREA);
+//      mMap.setMinZoomPreference(18.0f);
+//      mMap.setMaxZoomPreference(30.0f);
+
+//        LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+//        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(currentLatLng, 20);
+//        mMap.moveCamera(update);
+//        Toast.makeText(this, "onMapReady", Toast.LENGTH_SHORT).show();
+    }
+
+    protected void onLocationChanged(Location location) {
+        String latitude = Double.toString(location.getLatitude());
+        String longitude = Double.toString(location.getLongitude());
+        Log.v(TAG, "IN ON LOCATION CHANGE, lat=" + latitude + ", lon=" + longitude);
     }
 
     //Permission request
@@ -246,4 +259,29 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         c = c > 0 ? Math.min(1, c) : Math.max(-1, c);
         return 3959 * 1.609 * 1000 * Math.acos(c);
     }
+
+
+    void registerLocationUpdates() {
+
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new MyLocationListener();
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+    }
+
+
+
+
+
 }
