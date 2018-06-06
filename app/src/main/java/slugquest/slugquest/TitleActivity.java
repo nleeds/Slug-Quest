@@ -32,8 +32,8 @@ public class TitleActivity extends AppCompatActivity {
         String imageName = porterMeadowsEvent.imageName;
         //String imageName = "slugquest";
 
-        iv = (ImageView)findViewById(R.id.testImage);
-        iv.setImageResource(getResources().getIdentifier(imageName, "drawable", getPackageName()));
+        //iv = (ImageView)findViewById(R.id.testImage);
+        //iv.setImageResource(getResources().getIdentifier(imageName, "drawable", getPackageName()));
 
 
         Button startButton = findViewById(R.id.startButton);

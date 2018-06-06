@@ -262,7 +262,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         Log.v("REEDTEST", "\n=======PLAYER \n  longitude : " + longitude + "\n  latitude : " + latitude + "\n  inRadius : " + inRadius);
         Log.v("REEDTEST", "+++++++EVENT \n  longitude : " + circleLong + "\n  latitude : " + circleLat + "\n  inRadius : " + inRadius);
 
-        boolean check = inRadius < 5.0;
+        boolean check = inRadius < activeCircle.getRadius();
         Log.v("REEDTEST", "Check : " + check + "inRadius: " + inRadius);
 
 

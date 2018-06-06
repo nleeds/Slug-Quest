@@ -14,7 +14,7 @@ public class Globals extends Application{
     //Declares all events
     private Event[] eventArray= {
             new Event("Porter Meadows",36.994803, -122.067737,"sunset",1),
-            new Event("Buddha Hut",37.006443, -122.059919,"imagetest",0),
+            new Event("House",36.976465, -122.054937,"imagetest",0),
     };
 
     public Event getEvent(){
