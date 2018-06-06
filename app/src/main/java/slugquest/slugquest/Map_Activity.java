@@ -120,6 +120,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
         //mMap.setOnMyLocationButtonClickListener(this);
         //mMap.setOnMyLocationClickListener(this);
 
