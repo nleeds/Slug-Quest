@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEventListener;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -32,10 +34,21 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.util.Log;
 import android.location.LocationListener;
 
+import android.app.Activity;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageView;
+
+
 import java.util.Calendar;
 
 
-public class Map_Activity extends FragmentActivity implements OnMapReadyCallback {
+public class Map_Activity extends FragmentActivity implements OnMapReadyCallback, SensorEventListener {
 
     private GoogleMap mMap;
     private int LOCATION_PERMISSION = 1;
@@ -46,6 +59,17 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private Event activeEvent = null;
     private Circle activeCircle = null;
 
+    private SensorManager mSensorManager;
+    private Sensor mAccelerometer;
+    private Sensor mMagnetometer;
+    private float[] mLastAccelerometer = new float[3];
+    private float[] mLastMagnetometer = new float[3];
+    private boolean mLastAccelerometerSet = false;
+    private boolean mLastMagnetometerSet = false;
+    private float[] mR = new float[9];
+    private float[] mOrientation = new float[3];
+    private float mCurrentDegree = 0f;
+
     protected LocationListener locationListener;
     protected LocationManager locationManager;
     protected Context context;
@@ -55,6 +79,12 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         //Foundation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        // compass code
+        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        //mPointer = (ImageView) findViewById(R.id.pointer);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -78,6 +108,18 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         requestLocationPermission();
         registerLocationUpdates();
+    }
+
+    protected void onResume() {
+        super.onResume();
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
+    }
+
+    protected void onPause() {
+        super.onPause();
+        mSensorManager.unregisterListener(this, mAccelerometer);
+        mSensorManager.unregisterListener(this, mMagnetometer);
     }
 
     @Override
@@ -233,6 +275,42 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if (event.sensor == mAccelerometer) {
+            System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
+            mLastAccelerometerSet = true;
+        } else if (event.sensor == mMagnetometer) {
+            System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
+            mLastMagnetometerSet = true;
+        }
+        if (mLastAccelerometerSet && mLastMagnetometerSet) {
+            SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
+            SensorManager.getOrientation(mR, mOrientation);
+            float azimuthInRadians = mOrientation[0];
+            float azimuthInDegress = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
+            RotateAnimation ra = new RotateAnimation(
+                    mCurrentDegree,
+                    -azimuthInDegress,
+                    Animation.RELATIVE_TO_SELF, 0.5f,
+                    Animation.RELATIVE_TO_SELF,
+                    0.5f);
+
+            ra.setDuration(250);
+
+            ra.setFillAfter(true);
+
+
+            mCurrentDegree = -azimuthInDegress;
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // TODO Auto-generated method stub
+
+    }
+
     // check if point is inside geofence using the Haversine formula
     // https://stackoverflow.com/questions/30719757/is-there-any-api-for-calculating-geofence-breach-other-than-android-apis
     boolean checkInside(Circle circle, double longitude, double latitude) {
@@ -339,9 +417,13 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     }
 
     void compassDirection(){
-        Toast.makeText(Map_Activity.this, "Compass Button Pressed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(Map_Activity.this, "Compass : " + mCurrentDegree, Toast.LENGTH_SHORT).show();
+
 
 
     }
+
+
+
 
 }
