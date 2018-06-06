@@ -29,6 +29,8 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import android.util.Log;
+import android.location.LocationListener;
 
 import java.util.Calendar;
 
@@ -38,6 +40,12 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private int LOCATION_PERMISSION = 1;
     private Button eventButton;
+    private Event activeEvent = null;
+    private Circle activeCircle = null;
+
+    protected LocationListener locationListener;
+    protected LocationManager locationManager;
+    protected Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +55,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        requestLocationPermission();
 
         eventButton = findViewById(R.id.eventButton);
         eventButton.setOnClickListener(new Button.OnClickListener(){
@@ -55,6 +62,8 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                 nextEvent();
             }
         });
+        requestLocationPermission();
+        registerLocationUpdates();
     }
 
     @Override
@@ -62,9 +71,9 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         // Event Input  (String name, double xCoordinate, double yCoordinate, String image)
         //Event porterMeadowsEvent = new Event("Porter Meadows",36.994803, -122.067737,"sunset",1);
-        Event activeEvent = ((Globals) this.getApplication()).getEvent();
+        activeEvent = ((Globals) this.getApplication()).getEvent();
 
-        plotEvent(activeEvent);
+        plotEvent();
 
         //Active LatLang
         //LatLng activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
@@ -152,6 +161,8 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         //end test
 
 
+        checkInsideEvent();
+
 
         // Constrain the camera target to the general area
         LatLngBounds GAMEAREA = new LatLngBounds(
@@ -212,8 +223,61 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     boolean checkInside(Circle circle, double longitude, double latitude) {
         return calculateDistance(
                 circle.getCenter().longitude, circle.getCenter().latitude, longitude, latitude
-        ) < circle.getRadius();
+        ) < 2;
     }
+
+
+    void checkInsideEvent() {
+
+        double eventLong= activeEvent.yCoordinate;
+        double eventLat = activeEvent.xCoordinate;
+        double circleLong = activeCircle.getCenter().longitude;
+        double circleLat = activeCircle.getCenter().latitude;
+
+        //Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        //test to check if geofences work.
+        LocationManager locationManager = (LocationManager)
+                getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        //Redundant permission request
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        Location location = locationManager.getLastKnownLocation(locationManager
+                .getBestProvider(criteria, false));
+
+        double playerlatitude = location.getLatitude();
+        double playerlongitude = location.getLongitude();
+
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+
+        double inRadius =  calculateDistance(circleLong, circleLat, longitude, latitude);
+
+
+        Log.v("REEDTEST", "\n=======PLAYER \n  longitude : " + longitude + "\n  latitude : " + latitude + "\n  inRadius : " + inRadius);
+        Log.v("REEDTEST", "+++++++EVENT \n  longitude : " + circleLong + "\n  latitude : " + circleLat + "\n  inRadius : " + inRadius);
+
+        boolean check = inRadius < 5.0;
+        Log.v("REEDTEST", "Check : " + check + "inRadius: " + inRadius);
+
+
+
+        String isInside;
+        if (check == true) {
+            isInside = "you are in " + activeEvent.name ;
+        } else {
+            isInside = "you are not in " + activeEvent.name ;
+        }
+
+        Toast.makeText(Map_Activity.this, isInside, Toast.LENGTH_SHORT).show();
+
+
+    }
+
 
     // helper function for geofence
     double calculateDistance(
@@ -232,7 +296,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
 
    // Boils down the google maps plotting and circles to a function
-    void plotEvent(Event activeEvent){
+    void plotEvent(){
         // x and y coordinates
         LatLng activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
 
@@ -240,7 +304,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
 
         //Global Circle
-        Circle ActiveCircle = mMap.addCircle(new CircleOptions()
+        activeCircle = mMap.addCircle(new CircleOptions()
                 .center(activeLatLng)
                 .radius(150)
                 .fillColor(0x220000FF));
@@ -248,8 +312,29 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     //Clears old events, updates global active event, plots event with above function
     void nextEvent(){
+        checkInsideEvent();
         mMap.clear();
         ((Globals) this.getApplication()).updateEvent();
-        plotEvent(((Globals) this.getApplication()).getEvent());
+        activeEvent = ((Globals) this.getApplication()).getEvent();
+        plotEvent();
+    }
+
+    void registerLocationUpdates() {
+
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new MyLocationListener();
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+//        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
 }
