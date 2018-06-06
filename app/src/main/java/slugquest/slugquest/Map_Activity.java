@@ -40,6 +40,9 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private int LOCATION_PERMISSION = 1;
     private Button eventButton;
+    private Button locationCheckButton;
+    private Button compassCheckButton;
+
     private Event activeEvent = null;
     private Circle activeCircle = null;
 
@@ -49,19 +52,30 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //Foundation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        // Button Setup : Event, location, and compass buttons. Combine compass and location later
         eventButton = findViewById(R.id.eventButton);
         eventButton.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View v){
-                nextEvent();
-            }
+            public void onClick(View v){    nextEvent();    }
         });
+
+        locationCheckButton = findViewById(R.id.locationButton);
+        locationCheckButton.setOnClickListener(new Button.OnClickListener(){
+            public void onClick(View v){    checkInsideEvent();    }
+        });
+
+        compassCheckButton = findViewById(R.id.compassButton);
+        compassCheckButton.setOnClickListener(new Button.OnClickListener(){
+            public void onClick(View v){    compassDirection();   }
+        });
+
         requestLocationPermission();
         registerLocationUpdates();
     }
@@ -112,7 +126,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
+            //   here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
@@ -230,14 +244,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     void checkInsideEvent() {
 
-        double eventLong= activeEvent.yCoordinate;
-        double eventLat = activeEvent.xCoordinate;
-        double circleLong = activeCircle.getCenter().longitude;
-        double circleLat = activeCircle.getCenter().latitude;
-
-        //Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        //test to check if geofences work.
+        //location setup
         LocationManager locationManager = (LocationManager)
                 getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -250,33 +257,25 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         Location location = locationManager.getLastKnownLocation(locationManager
                 .getBestProvider(criteria, false));
 
-        double playerlatitude = location.getLatitude();
-        double playerlongitude = location.getLongitude();
-
         double longitude = location.getLongitude();
         double latitude = location.getLatitude();
+        double circleLong = activeCircle.getCenter().longitude;
+        double circleLat = activeCircle.getCenter().latitude;
 
+        //Checks distance from player location to center of the circle
         double inRadius =  calculateDistance(circleLong, circleLat, longitude, latitude);
 
-
-        Log.v("REEDTEST", "\n=======PLAYER \n  longitude : " + longitude + "\n  latitude : " + latitude + "\n  inRadius : " + inRadius);
-        Log.v("REEDTEST", "+++++++EVENT \n  longitude : " + circleLong + "\n  latitude : " + circleLat + "\n  inRadius : " + inRadius);
-
+        //See's if the player is in the current radius of the circle
         boolean check = inRadius < activeCircle.getRadius();
-        Log.v("REEDTEST", "Check : " + check + "inRadius: " + inRadius);
 
-
-
+        //Placeholder toasts
         String isInside;
         if (check == true) {
             isInside = "you are in " + activeEvent.name ;
         } else {
             isInside = "you are not in " + activeEvent.name ;
         }
-
         Toast.makeText(Map_Activity.this, isInside, Toast.LENGTH_SHORT).show();
-
-
     }
 
 
@@ -313,7 +312,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     //Clears old events, updates global active event, plots event with above function
     void nextEvent(){
-        checkInsideEvent();
+        //checkInsideEvent();
         mMap.clear();
         ((Globals) this.getApplication()).updateEvent();
         activeEvent = ((Globals) this.getApplication()).getEvent();
@@ -338,4 +337,11 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 //        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
+
+    void compassDirection(){
+        Toast.makeText(Map_Activity.this, "Compass Button Pressed", Toast.LENGTH_SHORT).show();
+
+
+    }
+
 }
