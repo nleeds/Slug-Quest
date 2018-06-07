@@ -47,8 +47,8 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".CreditsActivity"
-            android:label="Slug Quest - Credits"/>
-
+            android:label="Slug Quest - Credits" />
+        <activity android:name=".EventViewer"></activity>
     </application>
 
 </manifest>

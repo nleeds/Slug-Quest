@@ -98,7 +98,13 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         locationCheckButton = findViewById(R.id.locationButton);
         locationCheckButton.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View v){    checkInsideEvent();    }
+            public void onClick(View v){
+                //checkInsideEvent();
+                viewEvent();
+                nextEvent();
+                //Event thisEventName = ((Globals) this.getApplication()).getEvent();
+
+            }
         });
 
         compassCheckButton = findViewById(R.id.compassButton);
@@ -395,6 +401,17 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         ((Globals) this.getApplication()).updateEvent();
         activeEvent = ((Globals) this.getApplication()).getEvent();
         plotEvent();
+    }
+
+    void viewEvent(){
+        Event activeEvent = ((Globals) this.getApplication()).getEvent();
+        String activeEventName = activeEvent.name;
+        String activeEventImage = activeEvent.imageName;
+        Intent i = new Intent(Map_Activity.this, EventViewer.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        i.putExtra("eventName", activeEventName);
+        i.putExtra("eventImageName", activeEventImage);
+        startActivity(i);
     }
 
     void registerLocationUpdates() {
