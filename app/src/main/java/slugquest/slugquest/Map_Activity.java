@@ -59,6 +59,10 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private Event activeEvent = null;
     private Circle activeCircle = null;
 
+    float azimuth = 0;
+    float pitch = 0;
+    float roll = 0;
+    /*
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private Sensor mMagnetometer;
@@ -69,6 +73,27 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private float[] mR = new float[9];
     private float[] mOrientation = new float[3];
     private float mCurrentDegree = 0f;
+    */
+
+    //Compass variables
+    //private float[] mGravity = new float[3];
+    //private float[] mGeomagnetic = new float[3];
+//    private float azimuth = 0f;
+//    private float currentAzimuth = 0f;
+//    private SensorManager mSensorManager;
+//    private String comp = "Nurt";
+
+    //TRIAL FUCKING 3
+    private SensorManager mSensorManager;
+
+    private Sensor mSensorAccelerometer;
+    private Sensor mSensorMagnetometer;
+
+    private float[] mAccelerometerData = new float[3];
+    private float[] mMagnetometerData = new float[3];
+
+    private static final float VALUE_DRIFT = 0.05f;
+
 
     protected LocationListener locationListener;
     protected LocationManager locationManager;
@@ -82,8 +107,15 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         // compass code
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        mSensorAccelerometer = mSensorManager.getDefaultSensor(
+                Sensor.TYPE_ACCELEROMETER);
+
+        mSensorMagnetometer = mSensorManager.getDefaultSensor(
+                Sensor.TYPE_MAGNETIC_FIELD);
+
+        //mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        //mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         //mPointer = (ImageView) findViewById(R.id.pointer);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -112,14 +144,24 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-        mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
+
+
+        mSensorManager.registerListener(this,mSensorAccelerometer,SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this,mSensorMagnetometer,SensorManager.SENSOR_DELAY_NORMAL);
+
+//        mSensorManager.registerListener(this,mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+//                SensorManager.SENSOR_DELAY_GAME);
+//        mSensorManager.registerListener(this,mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+//                SensorManager.SENSOR_DELAY_GAME);
+
+        //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        //mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
     protected void onPause() {
         super.onPause();
-        mSensorManager.unregisterListener(this, mAccelerometer);
-        mSensorManager.unregisterListener(this, mMagnetometer);
+        mSensorManager.unregisterListener(this);
+        //mSensorManager.unregisterListener(this, mMagnetometer);
     }
 
     @Override
@@ -149,19 +191,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         // Global Active Test Marker
         //mMap.addMarker(new MarkerOptions().position(activeLatLng).title("Global Test"));
 
-        //markers
-        //mMap.addMarker(new MarkerOptions().position(Ucsc).title("Marker in UCSC"));
-        //mMap.addMarker(new MarkerOptions().position(BudaHut).title("Marker in BudaHut"));
-        //mMap.addMarker(new MarkerOptions().position(CatShrine).title("Marker in CatShrine"));
-        //mMap.addMarker(new MarkerOptions().position(McHenry).title("Marker in McHenry"));
-        //mMap.addMarker(new MarkerOptions().position(MerrillGarden).title("Marker in MerrillGarden"));
-        //mMap.addMarker(new MarkerOptions().position(PorterMeadows).title("Marker in PorterMeadows"));
-        //mMap.addMarker(new MarkerOptions().position(Arboretum).title("Marker in Arboretum"));
-        //mMap.addMarker(new MarkerOptions().position(KoiPond).title("Marker in KoiPond"));
-        //mMap.addMarker(new MarkerOptions().position(RockGarden).title("Marker in RockGarden"));
-//        mMap.addMarker(new MarkerOptions().position(QuarryPlaza).title("Marker in QuarryPlaza"));
-
-
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Ucsc));
 
         // Location Services -> need to ask permission
@@ -179,13 +208,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         mMap.getUiSettings().setCompassEnabled(true);
         //mMap.setOnMyLocationButtonClickListener(this);
         //mMap.setOnMyLocationClickListener(this);
-
-
-        //Global Circle
-        //Circle ActiveCircle = mMap.addCircle(new CircleOptions()
-        //        .center(activeLatLng)
-        //        .radius(150)
-        //        .fillColor(0x220000FF));
 
 
         //example of geofence area
@@ -276,33 +298,72 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor == mAccelerometer) {
-            System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
-            mLastAccelerometerSet = true;
-        } else if (event.sensor == mMagnetometer) {
-            System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
-            mLastMagnetometerSet = true;
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+        //NEW TEST
+        int sensorType = sensorEvent.sensor.getType();
+
+        switch (sensorType) {
+            case Sensor.TYPE_ACCELEROMETER:
+                mAccelerometerData = sensorEvent.values.clone();
+                break;
+            case Sensor.TYPE_MAGNETIC_FIELD:
+                mMagnetometerData = sensorEvent.values.clone();
+                break;
+            default:
+                return;
         }
-        if (mLastAccelerometerSet && mLastMagnetometerSet) {
-            SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
-            SensorManager.getOrientation(mR, mOrientation);
-            float azimuthInRadians = mOrientation[0];
-            float azimuthInDegress = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
-            RotateAnimation ra = new RotateAnimation(
-                    mCurrentDegree,
-                    -azimuthInDegress,
-                    Animation.RELATIVE_TO_SELF, 0.5f,
-                    Animation.RELATIVE_TO_SELF,
-                    0.5f);
 
-            ra.setDuration(250);
+        float[] rotationMatrix = new float[9];
+        boolean rotationOK = SensorManager.getRotationMatrix(rotationMatrix,
+                null, mAccelerometerData, mMagnetometerData);
 
-            ra.setFillAfter(true);
-
-
-            mCurrentDegree = -azimuthInDegress;
+        float orientationValues[] = new float[3];
+        if (rotationOK) {
+            SensorManager.getOrientation(rotationMatrix, orientationValues);
         }
+
+        azimuth = orientationValues[0];
+        pitch = orientationValues[1];
+        roll = orientationValues[2];
+
+
+//        final float alpha = 0.97f;
+//        synchronized (this){
+//
+//            Accelerometer stuff
+//            if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+//                mGravity[0] = alpha*mGravity[0]+(1-alpha)*sensorEvent.values[0];
+//                mGravity[1] = alpha*mGravity[1]+(1-alpha)*sensorEvent.values[1];
+//                mGravity[2] = alpha*mGravity[2]+(1-alpha)*sensorEvent.values[2];
+//
+//            }
+//
+//             switch to Geo
+//            if(sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
+//                mGeomagnetic[0] = alpha*mGeomagnetic[0]+(1-alpha)*sensorEvent.values[0];
+//                mGeomagnetic[1] = alpha*mGeomagnetic[1]+(1-alpha)*sensorEvent.values[1];
+//                mGeomagnetic[2] = alpha*mGeomagnetic[2]+(1-alpha)*sensorEvent.values[2];
+//
+//            }
+//
+//            float R[] = new float[9];
+//            float I[] = new float[9];
+//            boolean success = SensorManager.getRotationMatrix(R,I,mGravity,mGeomagnetic);
+//
+//            if(success){
+//
+//                float orientation[] = new float[3];
+//                SensorManager.getOrientation(R,orientation);
+//                azimuth = (float)Math.toDegrees(orientation[0]);
+//                azimuth = (azimuth + 360)%360;
+//                if (azimuth < 0) {
+//                    azimuth += 360;
+//
+//            }
+//
+//        }
+
     }
 
     @Override
@@ -417,10 +478,9 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     }
 
     void compassDirection(){
-        Toast.makeText(Map_Activity.this, "Compass : " + mCurrentDegree, Toast.LENGTH_SHORT).show();
 
-
-
+        
+        Toast.makeText(Map_Activity.this, "Azimuth : " + azimuth + "\nPitch: " + pitch + "\nRoll : " + roll, Toast.LENGTH_SHORT).show();
     }
 
 
