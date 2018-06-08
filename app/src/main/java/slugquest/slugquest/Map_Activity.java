@@ -48,6 +48,7 @@ import android.widget.ImageView;
 
 
 import java.util.Calendar;
+import java.util.Random;
 
 
 public class Map_Activity extends FragmentActivity implements OnMapReadyCallback, SensorEventListener {
@@ -264,7 +265,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         // Constrain the camera target to the general area
         LatLngBounds GAMEAREA = new LatLngBounds(
-                new LatLng(36.977163, -122.038426), new LatLng(37.010616, -122.044647));
+                new LatLng(36.965118, -122.078809), new LatLng(37.026231, -122.030529));
 
         mMap.setLatLngBoundsForCameraTarget(GAMEAREA);
         mMap.setMinZoomPreference(14.0f);
@@ -500,6 +501,33 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         
         Toast.makeText(Map_Activity.this, "Azimuth : " + azimuth + "\nPitch: " + pitch + "\nRoll : " + roll, Toast.LENGTH_SHORT).show();
+    }
+
+
+    // adapted from https://stackoverflow.com/questions/33976732/generate-random-latlng-given-device-location-and-radius
+    // takes as input a center and radius
+    // outputs a random point within circle
+    // can be used to create random circles containing events
+    LatLng generateRandomLatLngWithinArea(LatLng eventPoint, double radius){
+        double radiusInDegrees = radius / 111000f;
+        double lat = eventPoint.latitude;
+        double lon = eventPoint.longitude;
+        Random random = new Random();
+
+        double u = random.nextDouble();
+        double v = random.nextDouble();
+        double w = radiusInDegrees * Math.sqrt(u);
+        double t = 2 * Math.PI * v;
+        double x = w * Math.cos(t);
+        double y = w * Math.sin(t);
+
+        // Adjust the x-coordinate for the shrinking of the east-west distances
+        double new_x = x / Math.cos(lon);
+
+        double foundLatitude = new_x + lat;
+        double foundLongitude = y + lon;
+        LatLng randomLatLng = new LatLng(foundLatitude, foundLongitude);
+        return randomLatLng;
     }
 
 
