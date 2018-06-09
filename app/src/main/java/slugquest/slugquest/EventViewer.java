@@ -1,12 +1,18 @@
 package slugquest.slugquest;
 
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,7 +26,7 @@ public class EventViewer extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_viewer);
 
-        ImageView eventImageView = findViewById(R.id.imageViewEventView);
+        ImageView eventImageView = (ImageView) findViewById(R.id.imageViewEventView);
         TextView eventTextView = findViewById(R.id.textViewEventView);
         Button eventNextButton = findViewById(R.id.buttonEventViewProceed);
 
@@ -29,7 +35,10 @@ public class EventViewer extends AppCompatActivity {
         String eventImageName = i.getStringExtra("eventImageName");
 
         eventTextView.setText(eventName);
-        //eventImageView.setImageResource(getResources().getIdentifier(eventImageName, "drawable", getPackageName()));
+
+        Glide.with(this)  // Activity or Fragment
+                .load(getResources().getIdentifier(eventImageName, "drawable", getPackageName()))
+                .into(eventImageView);
 
         eventNextButton.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v){
@@ -40,4 +49,5 @@ public class EventViewer extends AppCompatActivity {
             }
         });
     }
+
 }
