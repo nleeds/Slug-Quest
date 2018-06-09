@@ -142,11 +142,11 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         locationCheckButton = findViewById(R.id.locationButton);
         locationCheckButton.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v){
-                //checkInsideEvent();
                 viewEvent();
-                nextEvent();
+                if (checkInsideEvent() == true) {
+                    nextEvent();
+                }
                 //Event thisEventName = ((Globals) this.getApplication()).getEvent();
-
             }
         });
 
@@ -384,7 +384,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    void checkInsideEvent() {
+    boolean checkInsideEvent() {
 
         //location setup
         LocationManager locationManager = (LocationManager)
@@ -393,7 +393,8 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         //Redundant permission request
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            Toast.makeText(Map_Activity.this, "location permission failed.", Toast.LENGTH_SHORT).show();
+            return false;
         }
 
         Location location = locationManager.getLastKnownLocation(locationManager
@@ -411,13 +412,16 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         boolean check = inRadius < activeCircle.getRadius();
 
         //Placeholder toasts
+        boolean retval = true;
         String isInside;
         if (check == true) {
             isInside = "you are in " + activeEvent.name ;
         } else {
             isInside = "you are not in " + activeEvent.name ;
+            retval = false;
         }
         Toast.makeText(Map_Activity.this, isInside, Toast.LENGTH_SHORT).show();
+        return retval;
     }
 
 
