@@ -14,9 +14,33 @@ public class Globals extends Application{
 
 
     //Declares all events
+    //TODO: replace with actual values
+    double unknownlat = 36.994803;
+    double unknownlng = -122.067737;
+
+    //
     private Event[] eventArray= {
-            new Event("Porter Meadows",36.994803, -122.067737,"sunset",1, dummyDirection),
-            new Event("House",36.976465, -122.054937,"imagetest",0, dummyDirection),
+
+            new Event("Porter Meadows",36.994803, -122.067737,"sunset",1,dummyDirection),
+            new Event("amphitheatre",unknownlat, unknownlng,"amphitheatre",2,dummyDirection),
+            new Event("bookstore rock",unknownlat, unknownlng,"bookstorerock",3,dummyDirection),
+            new Event("c10 mural",unknownlat, unknownlng,"c10mural",4,dummyDirection),
+            new Event("House",36.976465, -122.054937,"imagetest",5,dummyDirection),
+            new Event("carousel",unknownlat, unknownlng,"carousel",6,dummyDirection),
+            new Event("chaotic pendulum",36.998669, -122.059941,"chaoticpendulum",7,dummyDirection),
+            new Event("cowel fountain",unknownlat, unknownlng,"cowelfountain",8,dummyDirection),
+            new Event("deathly hallows",unknownlat, unknownlng,"deathlyhallows",9,dummyDirection),
+            new Event("dumpster art",37.000304, -122.058739,"dumpsterart",10,dummyDirection),
+            new Event("happy lamp",36.993012, -122.063405,"happylamp",11,dummyDirection),
+            new Event("media theatre seat",36.995894, -122.061044, "mediatheatreseat",12,dummyDirection),
+            new Event("rock stairs",unknownlat, unknownlng,"rockstairs",13,dummyDirection),
+            new Event("slug tunnel",unknownlat, unknownlng,"slugtunnel",14,dummyDirection),
+            new Event("stevenson bench",unknownlat, unknownlng,"stevensonbench",15,dummyDirection),
+            new Event("stevenson bust",unknownlat, unknownlng,"stevensonbust",16,dummyDirection),
+            new Event("the maternal tree",unknownlat, unknownlng,"thematernaltree",17,dummyDirection),
+            new Event("tree in building",unknownlat, unknownlng,"treeinbuilding",18,dummyDirection),
+            new Event("wood art",36.998175, -122.061495,"woodart",19,dummyDirection),
+            new Event("seal sculpture",36.998244, -122.061368,"sealsculpture",0,dummyDirection),
     };
 
     public Event getEvent(){
