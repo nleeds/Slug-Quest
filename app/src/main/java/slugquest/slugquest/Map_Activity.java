@@ -243,37 +243,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(Map_Activity.this, "Can't find style. Error: ", Toast.LENGTH_SHORT).show();
         }
 
-
-        //example of geofence area
-        Circle QUARRYPLAZA = mMap.addCircle(new CircleOptions()
-                .center(QuarryPlaza)
-                .radius(150)
-                .fillColor(0x220000FF));
-
-
-        //test to check if geofences work.
-
-        LocationManager locationManager = (LocationManager)
-                getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-
-        Location location = locationManager.getLastKnownLocation(locationManager
-                .getBestProvider(criteria, false));
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-
-        LatLng myLocation = new LatLng(latitude, longitude);
-        boolean inside = checkInside(QUARRYPLAZA, longitude, latitude);
-        String isInside;
-        if (inside == true) {
-            isInside = "you are in QUARRYPLAZA";
-        } else {
-            isInside = "you are not in QUARRYPLAZA";
-        }
-        mMap.addMarker(new MarkerOptions().position(myLocation).title((isInside)));
-        //end test
-
-
         checkInsideEvent();
 
 
@@ -324,7 +293,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == LOCATION_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Access denied", Toast.LENGTH_SHORT).show();
             }
