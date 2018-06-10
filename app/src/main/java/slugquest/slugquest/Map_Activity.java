@@ -68,6 +68,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private ImageView image;
     private ImageView compassImage;
     private ImageView scrollImage;
+    private ImageView locationImage;
     int scrollInt = 0;
 
     float azimuth = 0;
@@ -144,6 +145,18 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                     nextEvent();
                 }
                 //Event thisEventName = ((Globals) this.getApplication()).getEvent();
+            }
+        });
+
+
+        locationImage = findViewById(R.id.locationImage);
+        locationImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkInsideEvent() == true) {
+                    sound.playShortResource(R.raw.levelcomplete);
+                    nextEvent();
+                }
             }
         });
 
