@@ -10,14 +10,14 @@ public class Globals extends Application{
 
     // Declares active event that will be overwritten as user progresses
 //    private Event activeEvent = new Event("Global Event",36.994803, -122.067737,"sunset",1, dummyDirection);
-    private Event activeEvent = new Event("House",36.976465, -122.054937,"imagetest",1,dummyDirection);
+    private Event activeEvent = new Event("House",36.976465, -122.054937,"imagetest",2,dummyDirection);
     //public Event[] eventArray;
 
 
     //Declares all events
     //TODO: replace with actual values
-    double unknownlat = 36.994803;
-    double unknownlng = -122.067737;
+    double unknownlat = 36.976465;
+    double unknownlng = -122.054937;
 
     //
     private Event[] eventArray= {
