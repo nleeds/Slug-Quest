@@ -17,6 +17,8 @@ public class SoundPoolPlayer {
 
 
         mSounds.put(R.raw.levelcomplete, this.mShortPlayer.load(pContext, R.raw.levelcomplete, 1));
+        mSounds.put(R.raw.negativefeedback, this.mShortPlayer.load(pContext, R.raw.negativefeedback, 1));
+        mSounds.put(R.raw.powerup, this.mShortPlayer.load(pContext, R.raw.powerup, 1));
     }
 
     public void playShortResource(int piResource) {

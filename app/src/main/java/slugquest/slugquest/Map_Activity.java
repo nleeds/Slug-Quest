@@ -1,13 +1,10 @@
 package slugquest.slugquest;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEventListener;
 import android.location.Criteria;
@@ -20,6 +17,7 @@ import android.os.Bundle;
 import android.app.AlertDialog;
 import android.Manifest;
 import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -38,20 +36,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import android.util.Log;
 import android.location.LocationListener;
 
-import android.app.Activity;
-import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import com.bumptech.glide.Glide;
 
-import java.util.Calendar;
 import java.util.Random;
 
 import static android.content.ContentValues.TAG;
@@ -207,6 +199,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                     //image.setAlpha((float)0.0);
                     scrollInt = 1;
                 }
+                sound.playShortResource(R.raw.powerup);
 
 
             }
@@ -294,7 +287,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(Map_Activity.this, "Can't find style. Error: ", Toast.LENGTH_SHORT).show();
         }
 
-        checkInsideEvent();
+//        checkInsideEvent();
 
 
         // Constrain the camera target to the general area
@@ -459,13 +452,19 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         boolean check = inRadius < activeCircle.getRadius();
 
         //Placeholder toasts
-        String isInside;
-        if (check == true) {
-            isInside = "you are in " + activeEvent.name ;
-        } else {
-            isInside = "you are not in " + activeEvent.name ;
+        String message;
+        if (check != true) {
+            message = "You are not at " + activeEvent.name ;
+            sound.playShortResource(R.raw.negativefeedback);
+        }else{
+            message = "Congratulations you found " + activeEvent.name + "!" ;
         }
-        Toast.makeText(Map_Activity.this, isInside, Toast.LENGTH_SHORT).show();
+
+        Toast toast= Toast.makeText(getApplicationContext(),
+                message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+        toast.show();
+
         return check;
     }
 
@@ -498,7 +497,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         boolean check = inRadius < randomizedCircle.getRadius();
         double currentRadius = randomizedCircle.getRadius();
         if (check == true && currentRadius > 40) {
-            Toast.makeText(Map_Activity.this, "in circle", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(Map_Activity.this, "in circle", Toast.LENGTH_SHORT).show();
             currentRadius -= 20;
             randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, currentRadius-20);
             randomizedCircle.setCenter(randomizedCenter);
