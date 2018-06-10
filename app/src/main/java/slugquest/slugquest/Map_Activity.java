@@ -47,7 +47,9 @@ import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
-
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import com.bumptech.glide.Glide;
 
 import java.util.Calendar;
 import java.util.Random;
@@ -60,10 +62,14 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private Button eventButton;
     private Button locationCheckButton;
     private Button compassCheckButton;
+    private Button imageScrollButton;
 
     private Event activeEvent = null;
     private Circle activeCircle = null;
     private Circle randomizedCircle = null;
+
+    private ImageView image;
+    int scrollInt = 0;
 
     float azimuth = 0;
     float pitch = 0;
@@ -115,7 +121,10 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        //Comment out according view depending on what you're testing
+        //setContentView(R.layout.activity_map_developer);
         setContentView(R.layout.activity_map);
+
 
         // compass code
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
@@ -150,6 +159,64 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                 //Event thisEventName = ((Globals) this.getApplication()).getEvent();
             }
         });
+
+
+        // IMPORTANT loads active event's image
+        updateImage();
+
+        // Image scroll test button
+        imageScrollButton = findViewById(R.id.scrollbutton);
+        imageScrollButton.setOnClickListener(new Button.OnClickListener(){
+            public void onClick(View v){
+
+
+                if (scrollInt == 1){
+                    image.setAlpha((float)1.0);
+                    Animation animSlideDown = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slide_down);
+                    image.startAnimation(animSlideDown);
+
+                    animSlideDown.setAnimationListener(new Animation.AnimationListener(){
+                        @Override
+                        public void onAnimationStart(Animation arg0) {
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation arg0) {
+                        }
+                        @Override
+                        public void onAnimationEnd(Animation arg0) {
+                            image.setAlpha((float)0.0);
+                        }
+                    });
+
+
+                    scrollInt = 0;
+
+                }else{
+
+                    image.setAlpha((float)1.0);
+                    Animation animSlideUp = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slide_up);
+                    image.startAnimation(animSlideUp);
+
+                    animSlideUp.setAnimationListener(new Animation.AnimationListener(){
+                        @Override
+                        public void onAnimationStart(Animation arg0) {
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation arg0) {
+                        }
+                        @Override
+                        public void onAnimationEnd(Animation arg0) {
+                        }
+                    });
+
+                    //image.setAlpha((float)0.0);
+                    scrollInt = 1;
+                }
+
+
+            }
+        });
+
 
         compassCheckButton = findViewById(R.id.compassButton);
         compassCheckButton.setOnClickListener(new Button.OnClickListener(){
@@ -332,42 +399,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         roll = orientationValues[2];
 
 
-//        final float alpha = 0.97f;
-//        synchronized (this){
-//
-//            Accelerometer stuff
-//            if(sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-//                mGravity[0] = alpha*mGravity[0]+(1-alpha)*sensorEvent.values[0];
-//                mGravity[1] = alpha*mGravity[1]+(1-alpha)*sensorEvent.values[1];
-//                mGravity[2] = alpha*mGravity[2]+(1-alpha)*sensorEvent.values[2];
-//
-//            }
-//
-//             switch to Geo
-//            if(sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD){
-//                mGeomagnetic[0] = alpha*mGeomagnetic[0]+(1-alpha)*sensorEvent.values[0];
-//                mGeomagnetic[1] = alpha*mGeomagnetic[1]+(1-alpha)*sensorEvent.values[1];
-//                mGeomagnetic[2] = alpha*mGeomagnetic[2]+(1-alpha)*sensorEvent.values[2];
-//
-//            }
-//
-//            float R[] = new float[9];
-//            float I[] = new float[9];
-//            boolean success = SensorManager.getRotationMatrix(R,I,mGravity,mGeomagnetic);
-//
-//            if(success){
-//
-//                float orientation[] = new float[3];
-//                SensorManager.getOrientation(R,orientation);
-//                azimuth = (float)Math.toDegrees(orientation[0]);
-//                azimuth = (azimuth + 360)%360;
-//                if (azimuth < 0) {
-//                    azimuth += 360;
-//
-//            }
-//
-//        }
-
     }
 
     @Override
@@ -384,6 +415,19 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         ) < 2;
     }
 
+    String getImageName(){
+         return   ((Globals) this.getApplication()).getImage();
+    }
+
+    void updateImage(){
+        //Image allocation
+        image = (ImageView)findViewById(R.id.imageScroll);
+        String imageName = getImageName();
+
+        Glide.with(this)  // Activity or Fragment
+                .load(getResources().getIdentifier(imageName, "drawable", getPackageName()))
+                .into(image);
+    }
 
     boolean checkInsideEvent() {
 
@@ -472,6 +516,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         ((Globals) this.getApplication()).updateEvent();
         activeEvent = ((Globals) this.getApplication()).getEvent();
         plotEvent();
+        updateImage();
     }
 
     void viewEvent(){
@@ -492,12 +537,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
