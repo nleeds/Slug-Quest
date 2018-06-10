@@ -52,8 +52,10 @@ import android.widget.ImageView;
 import java.util.Calendar;
 import java.util.Random;
 
+import static android.content.ContentValues.TAG;
 
-public class Map_Activity extends FragmentActivity implements OnMapReadyCallback, SensorEventListener {
+
+public class Map_Activity extends FragmentActivity implements OnMapReadyCallback, SensorEventListener, LocationListener {
 
     private GoogleMap mMap;
     private int LOCATION_PERMISSION = 1;
@@ -64,6 +66,8 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private Event activeEvent = null;
     private Circle activeCircle = null;
     private Circle randomizedCircle = null;
+    private LatLng randomizedCenter = null;
+    private LatLng activeLatLng = null;
 
     float azimuth = 0;
     float pitch = 0;
@@ -153,7 +157,9 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         compassCheckButton = findViewById(R.id.compassButton);
         compassCheckButton.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View v){    compassDirection();   }
+            public void onClick(View v){
+                compassDirection();
+            }
         });
 
         requestLocationPermission();
@@ -185,30 +191,15 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        // Event Input  (String name, double xCoordinate, double yCoordinate, String image)
-        //Event porterMeadowsEvent = new Event("Porter Meadows",36.994803, -122.067737,"sunset",1);
         activeEvent = ((Globals) this.getApplication()).getEvent();
-
         plotEvent();
 
-        //Active LatLang
-        //LatLng activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
 
-        // points of interest
-        LatLng Ucsc = new LatLng(36.9915, -122.0583);
-        LatLng BudaHut = new LatLng(37.006443, -122.059919);
-        LatLng CatShrine = new LatLng(37.006699, -122.056143);
-        LatLng McHenry = new LatLng(36.995587, -122.058374);
-        LatLng MerrillGarden = new LatLng(36.998865, -122.051996);
-        LatLng PorterMeadows = new LatLng(36.994803, -122.067737);
-        LatLng Arboretum = new LatLng(36.983092, -122.060712);
-        LatLng KoiPond = new LatLng(37.000288, -122.048409);
-        LatLng RockGarden = new LatLng(37.001445, -122.049664);
-        LatLng QuarryPlaza = new LatLng(36.997631, -122.055762);
 
         // Global Active Test Marker
         //mMap.addMarker(new MarkerOptions().position(activeLatLng).title("Global Test"));
 
+        LatLng Ucsc = new LatLng(36.9915, -122.0583);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Ucsc));
 
         // Location Services -> need to ask permission
@@ -223,7 +214,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setCompassEnabled(true);
         //mMap.setOnMyLocationButtonClickListener(this);
         //mMap.setOnMyLocationClickListener(this);
 
@@ -250,8 +240,9 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         // Constrain the camera target to the general area
         LatLngBounds GAMEAREA = new LatLngBounds(
                 new LatLng(36.965118, -122.078809), new LatLng(37.026231, -122.030529));
-
         mMap.setLatLngBoundsForCameraTarget(GAMEAREA);
+
+        // restrict zoom
         mMap.setMinZoomPreference(14.0f);
         mMap.setMaxZoomPreference(30.0f);
     }
@@ -413,17 +404,55 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         boolean check = inRadius < activeCircle.getRadius();
 
         //Placeholder toasts
-        boolean retval = true;
         String isInside;
         if (check == true) {
             isInside = "you are in " + activeEvent.name ;
         } else {
             isInside = "you are not in " + activeEvent.name ;
-            retval = false;
         }
         Toast.makeText(Map_Activity.this, isInside, Toast.LENGTH_SHORT).show();
-        return retval;
+        return check;
     }
+
+
+
+    void checkInsideCircle() {
+
+        //location setup
+        LocationManager locationManager = (LocationManager)
+                getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        //Redundant permission request
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(Map_Activity.this, "location permission failed.", Toast.LENGTH_SHORT).show();
+        }
+
+        Location location = locationManager.getLastKnownLocation(locationManager
+                .getBestProvider(criteria, false));
+
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude();
+        double circleLong = randomizedCircle.getCenter().longitude;
+        double circleLat = randomizedCircle.getCenter().latitude;
+
+        //Checks distance from player location to center of the circle
+        double inRadius =  calculateDistance(circleLong, circleLat, longitude, latitude);
+
+        //See's if the player is in the current radius of the circle
+        boolean check = inRadius < randomizedCircle.getRadius();
+        double currentRadius = randomizedCircle.getRadius();
+        if (check == true && currentRadius > 40) {
+            Toast.makeText(Map_Activity.this, "in circle", Toast.LENGTH_SHORT).show();
+            currentRadius -= 20;
+            randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, currentRadius-20);
+            randomizedCircle.setCenter(randomizedCenter);
+            randomizedCircle.setRadius(currentRadius);
+        }
+        Toast.makeText(Map_Activity.this, "not in circle", Toast.LENGTH_SHORT).show();
+
+    }
+
 
 
     // helper function for geofence
@@ -445,7 +474,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
    // Boils down the google maps plotting and circles to a function
     void plotEvent(){
         // x and y coordinates
-        LatLng activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
+        activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
 
         // puts point on map for actual locations
         mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
@@ -458,7 +487,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                 .visible(false)
         );
 
-        LatLng randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, 80);
+        randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, 80);
         randomizedCircle = mMap.addCircle(new CircleOptions()
                 .center(randomizedCenter)
                 .radius(100)
@@ -500,13 +529,11 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 //        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
     }
 
     void compassDirection(){
-
-        
         Toast.makeText(Map_Activity.this, "Azimuth : " + azimuth + "\nPitch: " + pitch + "\nRoll : " + roll, Toast.LENGTH_SHORT).show();
     }
 
@@ -537,7 +564,24 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         return randomLatLng;
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        checkInsideCircle();
+        Log.v(TAG, "In Map Activity");
+    }
 
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
 
+    }
 
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }
