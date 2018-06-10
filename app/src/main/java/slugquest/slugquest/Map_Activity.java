@@ -65,6 +65,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private Button locationCheckButton;
     private Button compassCheckButton;
     private Button imageScrollButton;
+    private Button checkButton;
 
     private Event activeEvent = null;
     private Circle activeCircle = null;
@@ -90,7 +91,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private float[] mMagnetometerData = new float[3];
 
     private static final float VALUE_DRIFT = 0.05f;
-
+    public SoundPoolPlayer sound;
 
     protected LocationListener locationListener;
     protected LocationManager locationManager;
@@ -98,6 +99,9 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // sound player
+        sound = new SoundPoolPlayer(this);
+
         //Foundation
         super.onCreate(savedInstanceState);
 
@@ -130,28 +134,31 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
         /*
         // Button Setup : Event, location, and compass buttons. Combine compass and location later
         eventButton = findViewById(R.id.eventButton);
         eventButton.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v){    nextEvent();    }
         });
+        */
 
-        locationCheckButton = findViewById(R.id.locationButton);
-        locationCheckButton.setOnClickListener(new Button.OnClickListener(){
+        checkButton = findViewById(R.id.checkLocation);
+        checkButton.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v){
-                viewEvent();
                 if (checkInsideEvent() == true) {
+                    sound.playShortResource(R.raw.levelcomplete);
                     nextEvent();
                 }
                 //Event thisEventName = ((Globals) this.getApplication()).getEvent();
             }
         });
-        */
 
 
         // IMPORTANT loads active event's image
         updateImage();
+
+
 
         // Image scroll test button
         imageScrollButton = findViewById(R.id.scrollbutton);

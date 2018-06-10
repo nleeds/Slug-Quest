@@ -9,7 +9,8 @@ public class Globals extends Application{
     private float[] dummyDirection = {0.0f,0.0f,0.0f};
 
     // Declares active event that will be overwritten as user progresses
-    private Event activeEvent = new Event("Global Event",36.994803, -122.067737,"sunset",1, dummyDirection);
+//    private Event activeEvent = new Event("Global Event",36.994803, -122.067737,"sunset",1, dummyDirection);
+    private Event activeEvent = new Event("House",36.976465, -122.054937,"imagetest",1,dummyDirection);
     //public Event[] eventArray;
 
 
@@ -20,12 +21,11 @@ public class Globals extends Application{
 
     //
     private Event[] eventArray= {
-
-            new Event("Porter Meadows",36.994803, -122.067737,"sunset",1,dummyDirection),
-            new Event("amphitheatre",unknownlat, unknownlng,"amphitheatre",2,dummyDirection),
-            new Event("bookstore rock",unknownlat, unknownlng,"bookstorerock",3,dummyDirection),
-            new Event("c10 mural",unknownlat, unknownlng,"c10mural",4,dummyDirection),
-            new Event("House",36.976465, -122.054937,"imagetest",5,dummyDirection),
+            new Event("House",36.976465, -122.054937,"imagetest",1,dummyDirection),
+            new Event("Porter Meadows",36.994803, -122.067737,"sunset",2,dummyDirection),
+            new Event("amphitheatre",unknownlat, unknownlng,"amphitheatre",3,dummyDirection),
+            new Event("bookstore rock",unknownlat, unknownlng,"bookstorerock",4,dummyDirection),
+            new Event("c10 mural",unknownlat, unknownlng,"c10mural",5,dummyDirection),
             new Event("carousel",unknownlat, unknownlng,"carousel",6,dummyDirection),
             new Event("chaotic pendulum",36.998669, -122.059941,"chaoticpendulum",7,dummyDirection),
             new Event("cowel fountain",unknownlat, unknownlng,"cowelfountain",8,dummyDirection),
