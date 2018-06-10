@@ -40,6 +40,12 @@ public class Globals extends Application{
             new Event("the maternal tree",unknownlat, unknownlng,"thematernaltree",17,dummyDirection),
             new Event("tree in building",unknownlat, unknownlng,"treeinbuilding",18,dummyDirection),
             new Event("wood art",36.998175, -122.061495,"woodart",19,dummyDirection),
+            new Event("Crown bust",37.000155, -122.054505,"crownbust",20,dummyDirection),
+            new Event("engineering bars",37.000497,-122.061762,"engineeringbars",21,dummyDirection),
+            new Event("koi pond",36.994140,-122.065172,"koiopnd",22,dummyDirection),
+            new Event("lego-head pot",36.998645,-122.066009,"legopothead",23,dummyDirection),
+            new Event("Porter squiggle",36.993188, -122.065176,"squiggle",24,dummyDirection),
+            new Event("Porter totem pole",36.994986,-122.065322,"totempole",25,dummyDirection),
             new Event("seal sculpture",36.998244, -122.061368,"sealsculpture",0,dummyDirection),
     };
 
