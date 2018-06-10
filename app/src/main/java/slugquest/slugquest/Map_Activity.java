@@ -75,6 +75,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     private ImageView image;
     private ImageView compassImage;
+    private ImageView scrollImage;
     int scrollInt = 0;
 
     float azimuth = 0;
@@ -158,14 +159,12 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         // IMPORTANT loads active event's image
         updateImage();
 
+        //Scroll Image
 
-
-        // Image scroll test button
-        imageScrollButton = findViewById(R.id.scrollbutton);
-        imageScrollButton.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View v){
-
-
+        scrollImage = (ImageView) findViewById(R.id.scrollImageButton);
+        scrollImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 if (scrollInt == 1){
                     image.setAlpha((float)1.0);
                     Animation animSlideDown = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.slide_down);
@@ -212,6 +211,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+
 
         /*
         compassCheckButton = findViewById(R.id.compassButton);
