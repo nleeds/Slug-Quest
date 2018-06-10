@@ -63,6 +63,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     private Event activeEvent = null;
     private Circle activeCircle = null;
+    private Circle randomizedCircle = null;
 
     float azimuth = 0;
     float pitch = 0;
@@ -447,12 +448,20 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         LatLng activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
 
         // puts point on map for actual locations
-        mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
+//        mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
 
         //Global Circle
         activeCircle = mMap.addCircle(new CircleOptions()
                 .center(activeLatLng)
-                .radius(150)
+                .radius(10)
+                .fillColor(0xFF0000FF)
+                .visible(false)
+        );
+
+        LatLng randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, 90);
+        randomizedCircle = mMap.addCircle(new CircleOptions()
+                .center(randomizedCenter)
+                .radius(100)
                 .fillColor(0x220000FF));
     }
 
