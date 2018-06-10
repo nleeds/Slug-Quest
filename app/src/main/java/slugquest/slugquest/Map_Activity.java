@@ -448,17 +448,17 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         LatLng activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
 
         // puts point on map for actual locations
-//        mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
+        mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
 
         //Global Circle
         activeCircle = mMap.addCircle(new CircleOptions()
                 .center(activeLatLng)
-                .radius(10)
+                .radius(20)
                 .fillColor(0xFF0000FF)
                 .visible(false)
         );
 
-        LatLng randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, 90);
+        LatLng randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, 80);
         randomizedCircle = mMap.addCircle(new CircleOptions()
                 .center(randomizedCenter)
                 .radius(100)
