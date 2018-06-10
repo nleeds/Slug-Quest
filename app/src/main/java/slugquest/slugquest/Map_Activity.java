@@ -73,33 +73,14 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private LatLng activeLatLng = null;
 
     private ImageView image;
+    private ImageView compassImage;
     int scrollInt = 0;
 
     float azimuth = 0;
     float pitch = 0;
     float roll = 0;
-    /*
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
-    private Sensor mMagnetometer;
-    private float[] mLastAccelerometer = new float[3];
-    private float[] mLastMagnetometer = new float[3];
-    private boolean mLastAccelerometerSet = false;
-    private boolean mLastMagnetometerSet = false;
-    private float[] mR = new float[9];
-    private float[] mOrientation = new float[3];
-    private float mCurrentDegree = 0f;
-    */
 
-    //Compass variables
-    //private float[] mGravity = new float[3];
-    //private float[] mGeomagnetic = new float[3];
-//    private float azimuth = 0f;
-//    private float currentAzimuth = 0f;
-//    private SensorManager mSensorManager;
-//    private String comp = "Nurt";
-
-    //TRIAL FUCKING 3
+    //Compass Vars
     private SensorManager mSensorManager;
 
     private Sensor mSensorAccelerometer;
@@ -131,6 +112,8 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
 
         // compass code
+        compassImage = (ImageView)findViewById(R.id.compassImage);
+
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
 
         mSensorAccelerometer = mSensorManager.getDefaultSensor(
@@ -147,6 +130,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        /*
         // Button Setup : Event, location, and compass buttons. Combine compass and location later
         eventButton = findViewById(R.id.eventButton);
         eventButton.setOnClickListener(new Button.OnClickListener(){
@@ -163,6 +147,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
                 //Event thisEventName = ((Globals) this.getApplication()).getEvent();
             }
         });
+        */
 
 
         // IMPORTANT loads active event's image
@@ -221,13 +206,14 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
+        /*
         compassCheckButton = findViewById(R.id.compassButton);
         compassCheckButton.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v){
                 compassDirection();
             }
         });
+        */
 
         requestLocationPermission();
         registerLocationUpdates();
@@ -385,11 +371,29 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
             SensorManager.getOrientation(rotationMatrix, orientationValues);
         }
 
-        azimuth = orientationValues[0];
+        float azimuthLoc = (float)Math.toDegrees(orientationValues[0]);
+        azimuthLoc = (azimuthLoc + 360)%360;
+
+        Animation anim = new RotateAnimation(-azimuth, -azimuthLoc,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
+        azimuth = azimuthLoc;
+
+        anim.setDuration(500);
+        anim.setRepeatCount(0);
+        anim.setFillAfter(true);
+
+        compassImage.startAnimation(anim);
+        //RotateAnimation ra = new RotateAnimation(azimuth, -orientationValues[0], Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        // how long the animation will take place
+        //ra.setDuration(210);
+        // set the animation after the end of the reservation status
+        //ra.setFillAfter(true);
+        // Start the animation
+        //image.startAnimation(ra);
+        //currentDegree = -degree;
+
+        //azimuth = orientationValues[0];
         pitch = orientationValues[1];
         roll = orientationValues[2];
-
-
     }
 
     @Override
@@ -493,7 +497,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
             randomizedCircle.setCenter(randomizedCenter);
             randomizedCircle.setRadius(currentRadius);
         }
-        Toast.makeText(Map_Activity.this, "not in circle", Toast.LENGTH_SHORT).show();
 
     }
 
