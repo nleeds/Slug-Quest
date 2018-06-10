@@ -63,6 +63,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     private Event activeEvent = null;
     private Circle activeCircle = null;
+    private Circle randomizedCircle = null;
 
     float azimuth = 0;
     float pitch = 0;
@@ -142,11 +143,11 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         locationCheckButton = findViewById(R.id.locationButton);
         locationCheckButton.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v){
-                //checkInsideEvent();
                 viewEvent();
-                nextEvent();
+                if (checkInsideEvent() == true) {
+                    nextEvent();
+                }
                 //Event thisEventName = ((Globals) this.getApplication()).getEvent();
-
             }
         });
 
@@ -243,37 +244,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
             Toast.makeText(Map_Activity.this, "Can't find style. Error: ", Toast.LENGTH_SHORT).show();
         }
 
-
-        //example of geofence area
-        Circle QUARRYPLAZA = mMap.addCircle(new CircleOptions()
-                .center(QuarryPlaza)
-                .radius(150)
-                .fillColor(0x220000FF));
-
-
-        //test to check if geofences work.
-
-        LocationManager locationManager = (LocationManager)
-                getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-
-        Location location = locationManager.getLastKnownLocation(locationManager
-                .getBestProvider(criteria, false));
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-
-        LatLng myLocation = new LatLng(latitude, longitude);
-        boolean inside = checkInside(QUARRYPLAZA, longitude, latitude);
-        String isInside;
-        if (inside == true) {
-            isInside = "you are in QUARRYPLAZA";
-        } else {
-            isInside = "you are not in QUARRYPLAZA";
-        }
-        mMap.addMarker(new MarkerOptions().position(myLocation).title((isInside)));
-        //end test
-
-
         checkInsideEvent();
 
 
@@ -324,7 +294,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == LOCATION_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Access denied", Toast.LENGTH_SHORT).show();
             }
@@ -415,7 +385,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    void checkInsideEvent() {
+    boolean checkInsideEvent() {
 
         //location setup
         LocationManager locationManager = (LocationManager)
@@ -424,7 +394,8 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         //Redundant permission request
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            Toast.makeText(Map_Activity.this, "location permission failed.", Toast.LENGTH_SHORT).show();
+            return false;
         }
 
         Location location = locationManager.getLastKnownLocation(locationManager
@@ -442,13 +413,16 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         boolean check = inRadius < activeCircle.getRadius();
 
         //Placeholder toasts
+        boolean retval = true;
         String isInside;
         if (check == true) {
             isInside = "you are in " + activeEvent.name ;
         } else {
             isInside = "you are not in " + activeEvent.name ;
+            retval = false;
         }
         Toast.makeText(Map_Activity.this, isInside, Toast.LENGTH_SHORT).show();
+        return retval;
     }
 
 
@@ -474,12 +448,20 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         LatLng activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
 
         // puts point on map for actual locations
-        mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
+//        mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
 
         //Global Circle
         activeCircle = mMap.addCircle(new CircleOptions()
                 .center(activeLatLng)
-                .radius(150)
+                .radius(10)
+                .fillColor(0xFF0000FF)
+                .visible(false)
+        );
+
+        LatLng randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, 90);
+        randomizedCircle = mMap.addCircle(new CircleOptions()
+                .center(randomizedCenter)
+                .radius(100)
                 .fillColor(0x220000FF));
     }
 
