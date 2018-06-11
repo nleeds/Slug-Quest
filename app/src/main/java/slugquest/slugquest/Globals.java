@@ -9,7 +9,9 @@ public class Globals extends Application{
     private float dummyDirection = 0.0f;
 
     // Declares active event that will be overwritten as user progresses
-    private Event activeEvent = new Event("House",36.976465, -122.054937,"imagetest",0,dummyDirection);
+    //private Event activeEvent = new Event("House",36.976465, -122.054937,"imagetest",0,dummyDirection);
+    private Event activeEvent = new Event("The Slug Tunnel",36.9990133, -122.055885,"slugtunnel",1,100);
+
     //    private Event activeEvent = new Event("Global Event",36.994803, -122.067737,"sunset",1, dummyDirection);
 
     //public Event[] eventArray;
@@ -25,7 +27,6 @@ public class Globals extends Application{
             new Event("The Bookstore Rock",36.9980634, -122.0557556,"bookstorerock",7,300),
             new Event("The Amphitheatre",36.9988193, -122.0563132,"amphitheatre",8,20),
             new Event("The Rock Stairs",36.9988193, -122.0563132,"rockstairs",9,5),
-            new Event("The Slug Tunnel",36.9990133, -122.055885,"slugtunnel",10,100),
             new Event("The College Ten Murals",37.0030467, -122.058443,"c10mural",11,150),
             new Event("The Dumpster Art",37.000304, -122.058739,"dumpsterart",12,50),
             new Event("The Engineering Bars",37.000497,-122.061762,"engineeringbars",13,230),
@@ -38,7 +39,7 @@ public class Globals extends Application{
             new Event("The Porter Squiggle",36.993188, -122.065176,"squiggle",20,12),
             new Event("The Porter Koi Pond",36.994140,-122.065172,"koiopnd",21,75),
             new Event("The Porter Totem Pole",36.994986,-122.065322,"totempole",22,93),
-            new Event("The Lego-head P ots",36.998645,-122.066009,"legopothead",23,290),
+            new Event("The Lego-head P ots",36.998645,-122.066009,"legopothead",0,290),
     };
 
 

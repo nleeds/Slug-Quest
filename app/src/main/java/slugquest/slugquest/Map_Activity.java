@@ -475,17 +475,17 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         activeLatLng = new LatLng(activeEvent.xCoordinate,activeEvent.yCoordinate);
 
         // puts point on map for actual locations
-        mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
+        //mMap.addMarker(new MarkerOptions().position(activeLatLng).title(activeEvent.name));
 
         //Global Circle
         activeCircle = mMap.addCircle(new CircleOptions()
                 .center(activeLatLng)
-                .radius(20)
+                .radius(10)
                 .fillColor(0xFF0000FF)
                 .visible(false)
         );
 
-        randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, 80);
+        randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, 90);
         randomizedCircle = mMap.addCircle(new CircleOptions()
                 .center(randomizedCenter)
                 .radius(100)
@@ -538,7 +538,7 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         float angleDiff = (azimuth - activeAngle + 180 + 360) % 360 - 180;
 
-        Toast.makeText(Map_Activity.this, "Azimuth: " + azimuth + "\nActive Angle: " + activeAngle + "\nAngleDiff: " + angleDiff, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(Map_Activity.this, "Azimuth: " + azimuth + "\nActive Angle: " + activeAngle + "\nAngleDiff: " + angleDiff, Toast.LENGTH_SHORT).show();
 
         if(angleDiff < range){
             return true;
