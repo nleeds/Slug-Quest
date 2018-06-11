@@ -22,6 +22,20 @@ tools:context=".TitleActivity">
         app:layout_constraintTop_toBottomOf="@+id/settingsButton" />
 
     <Button
+        android:id="@+id/instructionsButton"
+        android:layout_width="242dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-condensed"
+        android:text="INSTRUCTIONS"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/creditsButton" />
+
+    <Button
         android:id="@+id/settingsButton"
         android:layout_width="242dp"
         android:layout_height="48dp"
