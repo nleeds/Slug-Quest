@@ -10,7 +10,7 @@ public class Globals extends Application{
 
     // Declares active event that will be overwritten as user progresses
     //private Event activeEvent = new Event("House",36.976465, -122.054937,"imagetest",0,dummyDirection);
-    private Event activeEvent = new Event("The Slug Tunnel",36.9990133, -122.055885,"slugtunnel",1,100);
+    private Event activeEvent = new Event("The Slug Tunnel",36.9997433, -122.0562936,"slugtunnel",1,100);
 
     //    private Event activeEvent = new Event("Global Event",36.994803, -122.067737,"sunset",1, dummyDirection);
 

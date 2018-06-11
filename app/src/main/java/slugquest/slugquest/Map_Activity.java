@@ -480,12 +480,12 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         //Global Circle
         activeCircle = mMap.addCircle(new CircleOptions()
                 .center(activeLatLng)
-                .radius(10)
+                .radius(20)
                 .fillColor(0xFF0000FF)
                 .visible(false)
         );
 
-        randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, 90);
+        randomizedCenter = generateRandomLatLngWithinArea(activeLatLng, 80);
         randomizedCircle = mMap.addCircle(new CircleOptions()
                 .center(randomizedCenter)
                 .radius(100)

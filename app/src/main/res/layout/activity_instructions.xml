@@ -9,6 +9,6 @@
     android:background="@drawable/tutorial"
     tools:context=".InstructionsActivity"
     tools:showIn="@layout/activity_instructions">
-    
+
 
 </android.support.constraint.ConstraintLayout>
