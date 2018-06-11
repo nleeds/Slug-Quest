@@ -137,16 +137,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         });
         */
 
-        checkButton = findViewById(R.id.checkLocation);
-        checkButton.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View v){
-                if (checkInsideEvent() == true) {
-                    sound.playShortResource(R.raw.levelcomplete);
-                    nextEvent();
-                }
-                //Event thisEventName = ((Globals) this.getApplication()).getEvent();
-            }
-        });
 
 
         locationImage = findViewById(R.id.locationImage);
