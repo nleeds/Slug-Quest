@@ -29,9 +29,9 @@ public class Event {
     public double xCoordinate;
     public double yCoordinate;
     public int next;
-    public float[] direction;
+    public float direction;
 
-    public Event(String nameInput, double xCoordinateInput, double yCoordinateInput, String imageInput, int nextInput, float[] directionInput){
+    public Event(String nameInput, double xCoordinateInput, double yCoordinateInput, String imageInput, int nextInput, float directionInput){
 
         // String Names
         name = nameInput;

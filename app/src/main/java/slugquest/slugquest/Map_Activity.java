@@ -53,11 +53,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private int LOCATION_PERMISSION = 1;
-    private Button eventButton;
-    private Button locationCheckButton;
-    private Button compassCheckButton;
-    private Button imageScrollButton;
-    private Button checkButton;
 
     private Event activeEvent = null;
     private Circle activeCircle = null;
@@ -69,15 +64,14 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
     private ImageView compassImage;
     private ImageView scrollImage;
     private ImageView locationImage;
-    int scrollInt = 0;
 
+    int scrollInt = 0;
     float azimuth = 0;
     float pitch = 0;
     float roll = 0;
 
     //Compass Vars
     private SensorManager mSensorManager;
-
     private Sensor mSensorAccelerometer;
     private Sensor mSensorMagnetometer;
 
@@ -129,20 +123,11 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
 
-        /*
-        // Button Setup : Event, location, and compass buttons. Combine compass and location later
-        eventButton = findViewById(R.id.eventButton);
-        eventButton.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View v){    nextEvent();    }
-        });
-        */
-
-
-
         locationImage = findViewById(R.id.locationImage);
         locationImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                compassCompare();
                 if (checkInsideEvent() == true) {
                     sound.playShortResource(R.raw.levelcomplete);
                     nextEvent();
@@ -155,7 +140,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         updateImage();
 
         //Scroll Image
-
         scrollImage = (ImageView) findViewById(R.id.scrollImageButton);
         scrollImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -208,16 +192,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
-        /*
-        compassCheckButton = findViewById(R.id.compassButton);
-        compassCheckButton.setOnClickListener(new Button.OnClickListener(){
-            public void onClick(View v){
-                compassDirection();
-            }
-        });
-        */
-
         requestLocationPermission();
         registerLocationUpdates();
     }
@@ -228,20 +202,11 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
 
         mSensorManager.registerListener(this,mSensorAccelerometer,SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this,mSensorMagnetometer,SensorManager.SENSOR_DELAY_NORMAL);
-
-//        mSensorManager.registerListener(this,mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-//                SensorManager.SENSOR_DELAY_GAME);
-//        mSensorManager.registerListener(this,mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-//                SensorManager.SENSOR_DELAY_GAME);
-
-        //mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
-        //mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
     protected void onPause() {
         super.onPause();
         mSensorManager.unregisterListener(this);
-        //mSensorManager.unregisterListener(this, mMagnetometer);
     }
 
     @Override
@@ -250,34 +215,18 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         activeEvent = ((Globals) this.getApplication()).getEvent();
         plotEvent();
 
-
-
-        // Global Active Test Marker
-        //mMap.addMarker(new MarkerOptions().position(activeLatLng).title("Global Test"));
-
         LatLng Ucsc = new LatLng(36.9915, -122.0583);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(Ucsc));
 
         // Location Services -> need to ask permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            //   here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         mMap.setMyLocationEnabled(true);
-        //mMap.setOnMyLocationButtonClickListener(this);
-        //mMap.setOnMyLocationClickListener(this);
-
 
 
         try {
-            // Customise the styling of the base map using a JSON object defined
-            // in a raw resource file.
             boolean success = googleMap.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(
                             this, R.raw.style_json));
@@ -289,9 +238,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         } catch (Resources.NotFoundException e) {
             Toast.makeText(Map_Activity.this, "Can't find style. Error: ", Toast.LENGTH_SHORT).show();
         }
-
-//        checkInsideEvent();
-
 
         // Constrain the camera target to the general area
         LatLngBounds GAMEAREA = new LatLngBounds(
@@ -385,14 +331,6 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         anim.setFillAfter(true);
 
         compassImage.startAnimation(anim);
-        //RotateAnimation ra = new RotateAnimation(azimuth, -orientationValues[0], Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-        // how long the animation will take place
-        //ra.setDuration(210);
-        // set the animation after the end of the reservation status
-        //ra.setFillAfter(true);
-        // Start the animation
-        //image.startAnimation(ra);
-        //currentDegree = -degree;
 
         //azimuth = orientationValues[0];
         pitch = orientationValues[1];
@@ -468,7 +406,11 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
         toast.show();
 
-        return check;
+        if(compassCompare()){
+            return check;
+        }else{
+            return false;
+        }
     }
 
 
@@ -588,6 +530,24 @@ public class Map_Activity extends FragmentActivity implements OnMapReadyCallback
         Toast.makeText(Map_Activity.this, "Azimuth : " + azimuth + "\nPitch: " + pitch + "\nRoll : " + roll, Toast.LENGTH_SHORT).show();
     }
 
+    boolean compassCompare(){
+
+        // Variables for degrees
+        float range = 200;
+        float activeAngle = ((Globals) this.getApplication()).getCompassAngle();
+
+        float angleDiff = (azimuth - activeAngle + 180 + 360) % 360 - 180;
+
+        Toast.makeText(Map_Activity.this, "Azimuth: " + azimuth + "\nActive Angle: " + activeAngle + "\nAngleDiff: " + angleDiff, Toast.LENGTH_SHORT).show();
+
+        if(angleDiff < range){
+            return true;
+        }else{
+            return false;
+        }
+
+        //  return true;
+    }
 
     // adapted from https://stackoverflow.com/questions/33976732/generate-random-latlng-given-device-location-and-radius
     // takes as input a center and radius
