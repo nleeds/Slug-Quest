@@ -48,6 +48,7 @@ public class TitleActivity extends AppCompatActivity {
         Button startButton = findViewById(R.id.startButton);
         Button settingsButton = findViewById(R.id.settingsButton);
         Button creditsButton = findViewById(R.id.creditsButton);
+        Button instructionsButton = findViewById(R.id.instructionsButton);
 
         startButton.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v){
@@ -68,6 +69,13 @@ public class TitleActivity extends AppCompatActivity {
         creditsButton.setOnClickListener(new Button.OnClickListener(){
             public void onClick(View v){
                 Intent i = new Intent(TitleActivity.this, CreditsActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+            }
+        });
+        instructionsButton.setOnClickListener(new Button.OnClickListener(){
+            public void onClick(View v){
+                Intent i = new Intent(TitleActivity.this, InstructionsActivity.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
             }
